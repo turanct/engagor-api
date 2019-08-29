@@ -24,6 +24,16 @@ final class Authentication
         $this->clientSecret = (string) $clientSecret;
     }
 
+    /**
+     * The first step in the OAuth2 authentication process.
+     *
+     * @param array $scopes The scopes we want to request.
+     * pick from these: identify accounts_read accounts_write socialprofiles email
+     *
+     * @param string $state A security value so that you can check the redirect came from you
+     *
+     * @return string The auth URL to redirect your user to
+     */
     public function step1(array $scopes, $state = '')
     {
         $url = "https://app.engagor.com/oauth/authorize/";
@@ -42,6 +52,13 @@ final class Authentication
         return $url;
     }
 
+    /**
+     * The first step in the OAuth2 authentication process.
+     *
+     * @param string $code The authentication code from the redirect URL
+     *
+     * @return array An associative array of OAuth2 authentication data
+     */
     public function step2($code)
     {
         $url = "https://app.engagor.com/oauth/access_token/";
