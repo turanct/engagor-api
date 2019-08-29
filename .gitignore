@@ -1,0 +1,13 @@
+/vendor/*
+/.vagrant/*
+
+composer.phar
+.php_cs.cache
+.DS_Store
+Thumbs.db
+.env
+test.php
+
+# PHPStorm
+.idea
+
