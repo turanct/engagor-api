@@ -22,7 +22,7 @@ final class Client
         $this->tokens = $tokens;
     }
 
-    private function request(RequestInterface $request)
+    private function execute(RequestInterface $request)
     {
         $uri = $request->getUri();
 
@@ -41,6 +41,6 @@ final class Client
             'https://api.engagor.com/me/'
         );
 
-        return json_decode($this->request($request)->getBody(), true);
+        return json_decode($this->execute($request)->getBody(), true);
     }
 }
