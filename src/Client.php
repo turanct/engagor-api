@@ -36,7 +36,7 @@ final class Client
             throw ApiCallFailed::forRequest($request, $e);
         }
 
-        $decodedResponse = json_decode($this->execute($request)->getBody(), true);
+        $decodedResponse = json_decode($response->getBody(), true);
 
         return $decodedResponse;
     }
@@ -48,6 +48,6 @@ final class Client
             'https://api.engagor.com/me/'
         );
 
-        return json_decode($this->execute($request)->getBody(), true);
+        return $this->execute($request);
     }
 }
