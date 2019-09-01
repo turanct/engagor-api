@@ -24,8 +24,6 @@ final class Client
 
     private function execute(RequestInterface $request)
     {
-        $uri = $request->getUri();
-
         $authorizedRequest = $request->withHeader(
             'Authorization',
             'Bearer ' . $this->tokens->getAccessToken()
