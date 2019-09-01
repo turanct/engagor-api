@@ -3,6 +3,7 @@
 namespace Engagor;
 
 use Psr\Http\Client\ClientInterface;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 
@@ -22,14 +23,22 @@ final class Client
         $this->tokens = $tokens;
     }
 
-    private function execute(RequestInterface $request)
+    public function execute(RequestInterface $request)
     {
         $authorizedRequest = $request->withHeader(
             'Authorization',
             'Bearer ' . $this->tokens->getAccessToken()
         );
 
-        return $this->client->sendRequest($authorizedRequest);
+        try {
+            $response = $this->client->sendRequest($authorizedRequest);
+        } catch (ClientExceptionInterface $e) {
+            throw ApiCallFailed::forRequest($request, $e);
+        }
+
+        $decodedResponse = json_decode($this->execute($request)->getBody(), true);
+
+        return $decodedResponse;
     }
 
     public function me()
