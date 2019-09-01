@@ -4,6 +4,7 @@ namespace Engagor;
 
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use DateTimeImmutable;
 
 final class Authentication
 {
@@ -77,6 +78,17 @@ final class Authentication
 
         $response = $this->client->sendRequest($request);
 
-        return json_decode($response->getBody(), true);
+        $responseAsArray = json_decode($response->getBody(), true);
+
+        if (isset($responseAsArray['error'])) {
+            throw AuthenticationFailed::fromResponseArray($responseAsArray);
+        }
+
+        return new Tokens(
+            $responseAsArray['access_token'],
+            new DateTimeImmutable('@' . (time() + $responseAsArray['expires_in'])),
+            explode(' ', $responseAsArray['scope']),
+            $responseAsArray['refresh_token']
+        );
     }
 }
