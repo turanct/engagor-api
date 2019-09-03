@@ -37,7 +37,7 @@ $httpClient = new Buzz\Client\Curl($requestFactory);
 $httpRequestFactory = new Nyholm\Psr7\Factory\Psr17Factory();
 
 $clientId = '<CLIENT ID HERE>';
-$clientId = '<CLIENT SECRET HERE>';
+$clientSecret = '<CLIENT SECRET HERE>';
 
 $authentication = new Engagor\Authentication(
     $httpClient,
