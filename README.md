@@ -73,7 +73,7 @@ https://example.com/your-redirect-url?state=<RANDOM STATE HERE>&code=<YOUR AUTH 
 You should verify the state to be the same that you generated when you called `step1()` to create the redirect URL in the previous step. If that check succeeds, the `code` that's also in the request to your redirect endpoint is what you'll need for the next step:
 
 ```php
-$url = $authentication->step2('<YOUR AUTH CODE>');
+$tokens = $authentication->step2('<YOUR AUTH CODE>');
 ```
 
 If it's successful, you should get a `Tokens` object, which holds the access & refresh tokens that we can use to issue calls to the Engage api.
