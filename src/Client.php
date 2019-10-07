@@ -42,6 +42,109 @@ final class Client
     }
 
     /**
+     * Enable or disable a crisis plan
+     *
+     * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Fcrisis%2Fevent
+     *
+     * @param string $accountId The account id
+     * @param string $crisisPlanId The crisis plan id
+     * @param bool $activate Indicate if a crisis plan should be enabled or disabled
+     * @param string $name Name of new crisis event
+     *
+     * @throws ApiCallFailed when something went wrong
+     *
+     * @return array A crisis_plan object
+     */
+    public function toggleCrisisEvent($accountId, $crisisPlanId, $activate = true, $name = '')
+    {
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            "https://api.engagor.com/{$accountId}/crisis/event"
+        );
+
+        $params = array(
+            'id' => (string) $crisisPlanId,
+            'activate' => $activate === true ? 'true' : 'false',
+        );
+
+        if (!empty($name)) {
+            $params['crisis_name'] = (string) $name;
+        }
+
+        $uri = $request->getUri();
+        $uri = $uri->withQuery(http_build_query($params));
+        $request = $request->withUri($uri);
+
+        return $this->execute($request);
+    }
+
+    /**
+     * Returns the crisis plans of an account.
+     *
+     * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Fcrisis%2Fplans
+     *
+     * @param string $accountId The account id
+     * @param bool $activeOnly Show active plans only
+     *
+     * @throws ApiCallFailed when something went wrong
+     *
+     * @return array A list of crisis_plan objects
+     */
+    public function getCrisisPlansForAccount($accountId, $activeOnly = false)
+    {
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            "https://api.engagor.com/{$accountId}/crisis/plans"
+        );
+
+        if ($activeOnly === true) {
+            $params = array(
+                'active_only' => '1',
+            );
+
+            $uri = $request->getUri();
+            $uri = $uri->withQuery(http_build_query($params));
+            $request = $request->withUri($uri);
+        }
+
+        return $this->execute($request);
+    }
+
+    /**
+     * Mark a todo-item as done or to do for a crisis in an account
+     *
+     * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Fcrisis%2Ftodo
+     *
+     * @param string $accountId The account id
+     * @param string $crisisPlanId Id of a crisis plan
+     * @param string $todoId Id of a todo-item
+     * @param bool $done Indicate if a todo-item should be marked as done or to do
+     *
+     * @throws ApiCallFailed when something went wrong
+     *
+     * @return array A crisis_plan object
+     */
+    public function toggleCrisisPlanTodo($accountId, $crisisPlanId, $todoId, $done)
+    {
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            "https://api.engagor.com/{$accountId}/crisis/todo"
+        );
+
+        $params = array(
+            'plan_id' => (string) $crisisPlanId,
+            'todo_id' => (string) $todoId,
+            'done' => $done === true ? 'true' : 'false',
+        );
+
+        $uri = $request->getUri();
+        $uri = $uri->withQuery(http_build_query($params));
+        $request = $request->withUri($uri);
+
+        return $this->execute($request);
+    }
+
+    /**
      * Returns details about the currently logged in user.
      * Use this function to identify who authorized your application.
      *
