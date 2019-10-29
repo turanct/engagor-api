@@ -145,6 +145,138 @@ final class Client
     }
 
     /**
+     * Add new mentions to your topic (in bulk).
+     *
+     * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Finbox%2Fadd
+     *
+     * @param string $accountId The account id
+     * @param array $mentions A JSON encoded array of mention items you want
+     * to add to your topic. (Maximum of 500.)
+     *
+     * @throws ApiCallFailed when something went wrong
+     *
+     * @return bool Were all mentions added successfully?
+     */
+    public function addMentionsToInbox($accountId, array $mentions)
+    {
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            "https://api.engagor.com/{$accountId}/inbox/add"
+        );
+
+        $params = array(
+            'mentions' => json_encode($mentions),
+        );
+
+        $uri = $request->getUri();
+        $uri = $uri->withQuery(http_build_query($params));
+        $request = $request->withUri($uri);
+
+        return $this->execute($request);
+    }
+
+    /**
+     * Returns a single social profile / contact.
+     *
+     * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Finbox%2Fcontact%2F%7Bcontact_id%7D
+     *
+     * @param string $accountId The account id
+     * @param string $contactId The contact id
+     * @param array $topicIds List of topic ids to search for details.
+     *
+     * @throws ApiCallFailed when something went wrong
+     *
+     * @return array A single contact item
+     */
+    public function getContact($accountId, $contactId, array $topicIds = array())
+    {
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            "https://api.engagor.com/{$accountId}/inbox/contact/{$contactId}"
+        );
+
+        if (!empty($topicIds)) {
+            $params = array(
+                'topic_ids' => implode(',', $topicIds),
+            );
+
+            $uri = $request->getUri();
+            $uri = $uri->withQuery(http_build_query($params));
+            $request = $request->withUri($uri);
+        }
+
+        return $this->execute($request);
+    }
+
+    /**
+     * Updates a single social profile / contact.
+     *
+     * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Finbox%2Fcontact%2F%7Bcontact_id%7D
+     *
+     * @param string $accountId The account id
+     * @param string $contactId The contact id
+     * @param array $updates Changes you want to make. Structure of the array
+     * should be like contact, with only those properties you want to update.
+     * (Property `socialprofiles` can't be updated.)
+     * @param array $options Options for the update. Supported keys:
+     * 'customattributes_edit_mode' (possible values: 'update', 'overwrite' or
+     * 'delete'; 'update' is default),
+     * 'tags_edit_mode' (possible values: 'add', 'update', or 'delete'; 'update'
+     * is default)
+     *
+     * @throws ApiCallFailed when something went wrong
+     *
+     * @return array A single contact item
+     */
+    public function updateContact(
+        $accountId,
+        $contactId,
+        array $updates,
+        array $options = array()
+    ) {
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            "https://api.engagor.com/{$accountId}/inbox/contact/{$contactId}"
+        );
+
+        $params = array(
+            'updates' => json_encode($updates),
+        );
+
+        if (!empty($options)) {
+            $params['options'] = json_encode($options);
+        }
+
+        $uri = $request->getUri();
+        $uri = $uri->withQuery(http_build_query($params));
+        $request = $request->withUri($uri);
+
+        return $this->execute($request);
+    }
+
+    /**
+     * Deletes a social profile / contact.
+     *
+     * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Finbox%2Fcontact%2F%7Bcontact_id%7D
+     *
+     * @param string $accountId The account id
+     * @param string $contactId The contact id
+     *
+     * @throws ApiCallFailed when something went wrong
+     *
+     * @return bool Boolean that indicates if contact details were deleted.
+     */
+    public function deleteContact($accountId, $contactId)
+    {
+        $request = $this->requestFactory->createRequest(
+            'DELETE',
+            "https://api.engagor.com/{$accountId}/inbox/contact/{$contactId}"
+        );
+
+        return $this->execute($request);
+    }
+
+    /**
      * Returns details about the currently logged in user.
      * Use this function to identify who authorized your application.
      *
