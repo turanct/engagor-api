@@ -430,6 +430,111 @@ final class Client
     }
 
     /**
+     * Returns a single publisher_mention object
+     *
+     * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Fpublisher%2Fmention%2F%7Bid%7D
+     *
+     * @param string $accountId The account id
+     * @param string $mentionId The mention id
+     *
+     * @throws ApiCallFailed when something went wrong
+     *
+     * @return array A single publisher_mention item
+     */
+    public function getPublisherMention($accountId, $mentionId)
+    {
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            "https://api.engagor.com/{$accountId}/publisher/mention/{$mentionId}"
+        );
+
+        return $this->execute($request);
+    }
+
+    /**
+     * Updates a single publisher_mention object
+     *
+     * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Fpublisher%2Fmention%2F%7Bid%7D
+     *
+     * @param string $accountId The account id
+     * @param string $mentionId The mention id
+     * @param array $updates An array of changes you want to make. Structured as
+     * a publisher_mention item, but with only the keys you want to update.
+     * @param array $options An array of options for the update.
+     * Supported keys: "tags_edit_mode", "sendMail"
+     *
+     * @throws ApiCallFailed when something went wrong
+     *
+     * @return array A single publisher_mention item
+     */
+    public function updatePublisherMention(
+        $accountId,
+        $mentionId,
+        array $updates,
+        array $options = []
+    ) {
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            "https://api.engagor.com/{$accountId}/publisher/mention/{$mentionId}"
+        );
+
+        $params = [];
+
+        if (!empty($updates)) {
+            $params['updates'] = json_encode($updates);
+        }
+
+        if (!empty($options)) {
+            $params['options'] = json_encode($options);
+        }
+
+        $uri = $request->getUri();
+        $uri = $uri->withQuery(http_build_query($params));
+        $request = $request->withUri($uri);
+
+        return $this->execute($request);
+    }
+
+    /**
+     * Deletes a single publisher_mention object
+     *
+     * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Fpublisher%2Fmention%2F%7Bid%7D
+     *
+     * @param string $accountId The account id
+     * @param string $mentionId The mention id
+     * @param array $options An array of options for the update.
+     * Supported keys: "tags_edit_mode", "sendMail"
+     *
+     * @throws ApiCallFailed when something went wrong
+     *
+     * @return array A single publisher_mention item
+     */
+    public function deletePublisherMention(
+        $accountId,
+        $mentionId,
+        array $options = []
+    ) {
+        $request = $this->requestFactory->createRequest(
+            'DELETE',
+            "https://api.engagor.com/{$accountId}/publisher/mention/{$mentionId}"
+        );
+
+
+        if (!empty($options)) {
+            $params = [
+                'options' => json_encode($options),
+            ];
+
+            $uri = $request->getUri();
+            $uri = $uri->withQuery(http_build_query($params));
+            $request = $request->withUri($uri);
+        }
+
+
+        return $this->execute($request);
+    }
+
+    /**
      * Returns details about the currently logged in user.
      * Use this function to identify who authorized your application.
      *
