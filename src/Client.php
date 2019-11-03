@@ -63,10 +63,10 @@ final class Client
             "https://api.engagor.com/{$accountId}/crisis/event"
         );
 
-        $params = array(
+        $params = [
             'id' => (string) $crisisPlanId,
             'activate' => $activate === true ? 'true' : 'false',
-        );
+        ];
 
         if (!empty($name)) {
             $params['crisis_name'] = (string) $name;
@@ -80,7 +80,7 @@ final class Client
     }
 
     /**
-     * Returns the crisis plans of an account.
+     * Returns the crisis plans of an account
      *
      * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Fcrisis%2Fplans
      *
@@ -99,9 +99,9 @@ final class Client
         );
 
         if ($activeOnly === true) {
-            $params = array(
+            $params = [
                 'active_only' => '1',
-            );
+            ];
 
             $uri = $request->getUri();
             $uri = $uri->withQuery(http_build_query($params));
@@ -132,11 +132,11 @@ final class Client
             "https://api.engagor.com/{$accountId}/crisis/todo"
         );
 
-        $params = array(
+        $params = [
             'plan_id' => (string) $crisisPlanId,
             'todo_id' => (string) $todoId,
             'done' => $done === true ? 'true' : 'false',
-        );
+        ];
 
         $uri = $request->getUri();
         $uri = $uri->withQuery(http_build_query($params));
@@ -146,13 +146,13 @@ final class Client
     }
 
     /**
-     * Add new mentions to your topic (in bulk).
+     * Add new mentions to your topic (in bulk)
      *
      * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Finbox%2Fadd
      *
      * @param string $accountId The account id
      * @param array $mentions A JSON encoded array of mention items you want
-     * to add to your topic. (Maximum of 500.)
+     * to add to your topic (Maximum of 500)
      *
      * @throws ApiCallFailed when something went wrong
      *
@@ -165,9 +165,9 @@ final class Client
             "https://api.engagor.com/{$accountId}/inbox/add"
         );
 
-        $params = array(
+        $params = [
             'mentions' => json_encode($mentions),
-        );
+        ];
 
         $uri = $request->getUri();
         $uri = $uri->withQuery(http_build_query($params));
@@ -177,19 +177,19 @@ final class Client
     }
 
     /**
-     * Returns a single social profile / contact.
+     * Returns a single social profile / contact
      *
      * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Finbox%2Fcontact%2F%7Bcontact_id%7D
      *
      * @param string $accountId The account id
      * @param string $contactId The contact id
-     * @param array $topicIds List of topic ids to search for details.
+     * @param array $topicIds List of topic ids to search for details
      *
      * @throws ApiCallFailed when something went wrong
      *
      * @return array A single contact item
      */
-    public function getContact($accountId, $contactId, array $topicIds = array())
+    public function getContact($accountId, $contactId, array $topicIds = [])
     {
         $request = $this->requestFactory->createRequest(
             'GET',
@@ -197,9 +197,9 @@ final class Client
         );
 
         if (!empty($topicIds)) {
-            $params = array(
+            $params = [
                 'topic_ids' => implode(',', $topicIds),
-            );
+            ];
 
             $uri = $request->getUri();
             $uri = $uri->withQuery(http_build_query($params));
@@ -210,7 +210,7 @@ final class Client
     }
 
     /**
-     * Updates a single social profile / contact.
+     * Updates a single social profile / contact
      *
      * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Finbox%2Fcontact%2F%7Bcontact_id%7D
      *
@@ -233,16 +233,16 @@ final class Client
         $accountId,
         $contactId,
         array $updates,
-        array $options = array()
+        array $options = []
     ) {
         $request = $this->requestFactory->createRequest(
             'POST',
             "https://api.engagor.com/{$accountId}/inbox/contact/{$contactId}"
         );
 
-        $params = array(
+        $params = [
             'updates' => json_encode($updates),
-        );
+        ];
 
         if (!empty($options)) {
             $params['options'] = json_encode($options);
@@ -256,7 +256,7 @@ final class Client
     }
 
     /**
-     * Deletes a social profile / contact.
+     * Deletes a social profile / contact
      *
      * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Finbox%2Fcontact%2F%7Bcontact_id%7D
      *
@@ -265,7 +265,7 @@ final class Client
      *
      * @throws ApiCallFailed when something went wrong
      *
-     * @return bool Boolean that indicates if contact details were deleted.
+     * @return bool Boolean that indicates if contact details were deleted
      */
     public function deleteContact($accountId, $contactId)
     {
@@ -278,30 +278,34 @@ final class Client
     }
 
     /**
-     * Returns a single social profile / contact.
+     * Returns a single social profile / contact
      *
      * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Finbox%2Fcontact%2F%7Bservice%7D%2F%7Bservice_id%7D
      *
      * @param string $accountId The account id
      * @param string $service The service
      * @param string $serviceId The service id
-     * @param array $topicIds List of topic ids to search for details.
+     * @param array $topicIds List of topic ids to search for details
      *
      * @throws ApiCallFailed when something went wrong
      *
      * @return array A single contact item
      */
-    public function getContactByServiceId($accountId, $service, $serviceId, array $topicIds = array())
-    {
+    public function getContactByServiceId(
+        $accountId,
+        $service,
+        $serviceId,
+        array $topicIds = []
+    ) {
         $request = $this->requestFactory->createRequest(
             'GET',
             "https://api.engagor.com/{$accountId}/inbox/contact/{$service}/{$serviceId}"
         );
 
         if (!empty($topicIds)) {
-            $params = array(
+            $params = [
                 'topic_ids' => implode(',', $topicIds),
-            );
+            ];
 
             $uri = $request->getUri();
             $uri = $uri->withQuery(http_build_query($params));
@@ -312,7 +316,7 @@ final class Client
     }
 
     /**
-     * Updates a single social profile / contact.
+     * Updates a single social profile / contact
      *
      * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Finbox%2Fcontact%2F%7Bservice%7D%2F%7Bservice_id%7D
      *
@@ -337,16 +341,16 @@ final class Client
         $service,
         $serviceId,
         array $updates,
-        array $options = array()
+        array $options = []
     ) {
         $request = $this->requestFactory->createRequest(
             'POST',
             "https://api.engagor.com/{$accountId}/inbox/contact/{$service}/{$serviceId}"
         );
 
-        $params = array(
+        $params = [
             'updates' => json_encode($updates),
-        );
+        ];
 
         if (!empty($options)) {
             $params['options'] = json_encode($options);
@@ -574,17 +578,14 @@ final class Client
             'https://api.engagor.com/me/accounts'
         );
 
-        $params = array();
+        $params = [];
 
         if ($pageToken !== '') {
-            $params = array(
-                'page_token' => (string) $pageToken,
-            );
+            $params['page_token'] = (string) $pageToken;
         }
+
         if ($limit !== 10) {
-            $params = array(
-                'limit' => (int) $limit,
-            );
+            $params['limit'] = (int) $limit;
         }
 
         if (!empty($params)) {
@@ -615,17 +616,14 @@ final class Client
             'https://api.engagor.com/me/connectedprofiles'
         );
 
-        $params = array();
+        $params = [];
 
         if ($pageToken !== '') {
-            $params = array(
-                'page_token' => (string) $pageToken,
-            );
+            $params['page_token'] = (string) $pageToken;
         }
+
         if ($limit !== 10) {
-            $params = array(
-                'limit' => (int) $limit,
-            );
+            $params['limit'] = (int) $limit;
         }
 
         if (!empty($params)) {
