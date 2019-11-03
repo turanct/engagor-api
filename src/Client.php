@@ -426,9 +426,178 @@ final class Client
             $params['sort'] = (string) $sort;
         }
 
-        $uri = $request->getUri();
-        $uri = $uri->withQuery(http_build_query($params));
-        $request = $request->withUri($uri);
+        if (!empty($params)) {
+            $uri = $request->getUri();
+            $uri = $uri->withQuery(http_build_query($params));
+            $request = $request->withUri($uri);
+        }
+
+        return $this->execute($request);
+    }
+
+    /**
+     * Returns a list of services, and associated configuration options, for
+     * publishing new messages on your social profiles
+     *
+     * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Fpublisher%2Fadd
+     *
+     * @param string $accountId The account id
+     * @param string $type The type of action you want to do. To publish a new
+     * tweet or message use 'post', other options include 'reply' (eg. Twitter
+     * replies), 'privatemessage', 'comment' (eg. Facebook comments), 'like',
+     * 'favorite', 'retweet', 'reblog', 'submit' (Tumblr)
+     * @param string $topicId The topic's id of the mention you want to reply to
+     * @param string $mentionId The id of the mention you want to reply to
+     *
+     * @throws ApiCallFailed when something went wrong
+     *
+     * @return array A single publisher_mention item
+     */
+    public function getPublisherOptions(
+        $accountId,
+        $type = 'post',
+        $topicId = null,
+        $mentionId = null
+    ) {
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            "https://api.engagor.com/{$accountId}/publisher/add"
+        );
+
+        $params = [];
+
+        if (!empty($type)) {
+            $params['type'] = (string) $type;
+        }
+
+        if (!empty($topicId)) {
+            $params['topic_id'] = (string) $topicId;
+        }
+
+        if (!empty($mentionId)) {
+            $params['mention_id'] = (string) $mentionId;
+        }
+
+        if (!empty($params)) {
+            $uri = $request->getUri();
+            $uri = $uri->withQuery(http_build_query($params));
+            $request = $request->withUri($uri);
+        }
+
+        return $this->execute($request);
+    }
+
+    /**
+     * Publishes a new message to one or more of social profiles
+     * (create drafts and send messages for approval)
+     *
+     * Note: We cannot expose real publishing functionality in our API per
+     * third-party terms of service agreements (eg. Twitter Api Rules), so only
+     * creating drafts, or queueing messages for approval is exposed to
+     * non-Engagor applications.
+     *
+     * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Fpublisher%2Fadd
+     *
+     * @param string $accountId The account id
+     * @param string $type The type of action you want to do. To publish a new
+     * tweet or message use 'post', other options include 'reply' (eg. Twitter
+     * replies), 'privatemessage', 'comment' (eg. Facebook comments), 'like',
+     * 'favorite', 'retweet', 'reblog', 'submit' (Tumblr)
+     * @param array $services An array of items with properties 'type' and
+     * 'service_id'. One or more services you want to publish to (any of the
+     * services retrieved by GET /:account_id/publisher/add).
+     * Eg. '[{"type":"facebook","service_id":"999999999999"}]'
+     * @param array $to An array of items with property 'id'. Eg.
+     * '[{"id":"info@abstergostore.com"},{"id":"no-reply@abstergostore.com"}]'
+     * @param string $subject The text of the subject to post
+     * @param string $message The text of the message to post
+     * @param string $status The status the message will be in;
+     * possible values are 'draft' or 'awaitingapproval'
+     * @param DateTimeInterface $publishDate date to publish the item
+     * (Leave empty for 'now')
+     * @param string $topicId Topic id of the mention you're replying to, retweeting...
+     * @param string $mentionId Id of the mention you're replying to, retweeting...
+     * @param array $media An array of the ids returned from the media/add endpoint.
+     * @param string $cannedResponseId Id of a canned response (The id is
+     * required for canned responses of the type CSAT, NPS® or Buttons). If
+     * the id is given, the number of usages will increase. If you use a canned
+     * response, the message of the response should be given in the message
+     * field and images should be added to the media field
+     *
+     * @throws ApiCallFailed when something went wrong
+     *
+     * @return array A single publisher_mention item
+     */
+    public function publish(
+        $accountId,
+        $type,
+        array $services,
+        array $to = [],
+        $subject = '',
+        $message = '',
+        $status = '',
+        DateTimeInterface $publishDate = null,
+        $topicId = null,
+        $mentionId = null,
+        array $media = [],
+        $cannedResponseId = null
+    ) {
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            "https://api.engagor.com/{$accountId}/publisher/add"
+        );
+
+        $params = [];
+
+        if (!empty($type)) {
+            $params['type'] = (string) $type;
+        }
+
+        if (!empty($services)) {
+            $params['services'] = json_encode($services);
+        }
+
+        if (!empty($to)) {
+            $params['to'] = json_encode($to);
+        }
+
+        if (!empty($subject)) {
+            $params['subject'] = (string) $subject;
+        }
+
+        if (!empty($message)) {
+            $params['message'] = (string) $message;
+        }
+
+        if (!empty($status)) {
+            $params['status'] = (string) $status;
+        }
+
+        if ($publishDate instanceof DateTimeInterface) {
+            $params['date_publish'] = $publishDate->format('c');
+        }
+
+        if (!empty($topicId)) {
+            $params['topic_id'] = (string) $topicId;
+        }
+
+        if (!empty($mentionId)) {
+            $params['mention_id'] = (string) $mentionId;
+        }
+
+        if (!empty($media)) {
+            $params['media'] = json_encode($media);
+        }
+
+        if (!empty($cannedResponseId)) {
+            $params['canned_response_id'] = (string) $cannedResponseId;
+        }
+
+        if (!empty($params)) {
+            $uri = $request->getUri();
+            $uri = $uri->withQuery(http_build_query($params));
+            $request = $request->withUri($uri);
+        }
 
         return $this->execute($request);
     }
@@ -492,9 +661,11 @@ final class Client
             $params['options'] = json_encode($options);
         }
 
-        $uri = $request->getUri();
-        $uri = $uri->withQuery(http_build_query($params));
-        $request = $request->withUri($uri);
+        if (!empty($params)) {
+            $uri = $request->getUri();
+            $uri = $uri->withQuery(http_build_query($params));
+            $request = $request->withUri($uri);
+        }
 
         return $this->execute($request);
     }
