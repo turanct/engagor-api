@@ -6,6 +6,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
+use DateTimeInterface;
 
 final class Client
 {
@@ -272,6 +273,158 @@ final class Client
             'DELETE',
             "https://api.engagor.com/{$accountId}/inbox/contact/{$contactId}"
         );
+
+        return $this->execute($request);
+    }
+
+    /**
+     * Returns a single social profile / contact.
+     *
+     * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Finbox%2Fcontact%2F%7Bservice%7D%2F%7Bservice_id%7D
+     *
+     * @param string $accountId The account id
+     * @param string $service The service
+     * @param string $serviceId The service id
+     * @param array $topicIds List of topic ids to search for details.
+     *
+     * @throws ApiCallFailed when something went wrong
+     *
+     * @return array A single contact item
+     */
+    public function getContactByServiceId($accountId, $service, $serviceId, array $topicIds = array())
+    {
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            "https://api.engagor.com/{$accountId}/inbox/contact/{$service}/{$serviceId}"
+        );
+
+        if (!empty($topicIds)) {
+            $params = array(
+                'topic_ids' => implode(',', $topicIds),
+            );
+
+            $uri = $request->getUri();
+            $uri = $uri->withQuery(http_build_query($params));
+            $request = $request->withUri($uri);
+        }
+
+        return $this->execute($request);
+    }
+
+    /**
+     * Updates a single social profile / contact.
+     *
+     * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Finbox%2Fcontact%2F%7Bservice%7D%2F%7Bservice_id%7D
+     *
+     * @param string $accountId The account id
+     * @param string $service The service
+     * @param string $serviceId The service id
+     * @param array $updates Changes you want to make. Structure of the array
+     * should be like contact, with only those properties you want to update.
+     * (Property `socialprofiles` can't be updated.)
+     * @param array $options Options for the update. Supported keys:
+     * 'customattributes_edit_mode' (possible values: 'update', 'overwrite' or
+     * 'delete'; 'update' is default),
+     * 'tags_edit_mode' (possible values: 'add', 'update', or 'delete'; 'update'
+     * is default)
+     *
+     * @throws ApiCallFailed when something went wrong
+     *
+     * @return array A single contact item
+     */
+    public function updateContactByServiceId(
+        $accountId,
+        $service,
+        $serviceId,
+        array $updates,
+        array $options = array()
+    ) {
+        $request = $this->requestFactory->createRequest(
+            'POST',
+            "https://api.engagor.com/{$accountId}/inbox/contact/{$service}/{$serviceId}"
+        );
+
+        $params = array(
+            'updates' => json_encode($updates),
+        );
+
+        if (!empty($options)) {
+            $params['options'] = json_encode($options);
+        }
+
+        $uri = $request->getUri();
+        $uri = $uri->withQuery(http_build_query($params));
+        $request = $request->withUri($uri);
+
+        return $this->execute($request);
+    }
+
+    /**
+     * Returns a list of contacts ordered by contact.id
+     *
+     * https://developers.engagor.com/documentation/endpoints/?url=%2F%7Baccount_id%7D%2Finbox%2Fcontacts
+     *
+     * @param string $accountId The account id
+     * @param array $requiredFields A JSON encoded array of fields that should
+     * be filled in for the returned contact objects.
+     * Possible values: "email", "name", "company", "phone"
+     * @param string $filter Optional filter rule for returned contacts.
+     * (Currently only filters of type `contacttag:tagname` are supported.
+     * `AND`, `OR` and `NOT`-clauses are also not supported yet.)
+     * @param DateTimeInterface $updatedSince Optional date. When set, only contacts
+     * updated after this time will be returned.
+     * @param string $pageToken Paging parameter.
+     * @param int $limit Amount of contacts to return
+     * @param string $sort Ordering of the contacts.
+     * Possible options: `dateadd:asc`, `dateadd:desc`, `lastupdate:asc`, `lastupdate:desc`
+     *
+     * @throws ApiCallFailed when something went wrong
+     *
+     * @return array paged_list of contact items, ordered by contact.id
+     */
+    public function getContacts(
+        $accountId,
+        array $requiredFields = [],
+        $filter = '',
+        DateTimeInterface $updatedSince = null,
+        $pageToken = '',
+        $limit = 20,
+        $sort = 'dateadd:asc'
+    ) {
+        $request = $this->requestFactory->createRequest(
+            'GET',
+            "https://api.engagor.com/{$accountId}/inbox/contacts"
+        );
+
+        $params = [];
+
+        if (!empty($requiredFields)) {
+            $params['required_fields'] = json_encode($requiredFields);
+        }
+
+        if (!empty($filter)) {
+            $params['filter'] = (string) $filter;
+        }
+
+        if ($updatedSince instanceof DateTimeInterface) {
+            $params['updated_since'] = $updatedSince->format('c');
+        }
+
+        if (!empty($pageToken)) {
+            $params['page_token'] = (string) $pageToken;
+        }
+
+        if (!empty($limit) && is_int($limit) && $limit <= 0) {
+            $params['limit'] = $limit;
+        }
+
+        if (!empty($sort)) {
+            $params['sort'] = (string) $sort;
+        }
+
+        $uri = $request->getUri();
+        $uri = $uri->withQuery(http_build_query($params));
+        $request = $request->withUri($uri);
 
         return $this->execute($request);
     }
