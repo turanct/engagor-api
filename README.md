@@ -51,13 +51,13 @@ Once you have created this instance, you can use it to authenticate the user of 
 
 ```php
 $url = $authentication->step1(
-    array(
+    [
         'identify',
         'accounts_read',
         'accounts_write',
         'socialprofiles',
         'email',
-    ),
+    ],
     '<RANDOM STATE HERE>'
 );
 ```

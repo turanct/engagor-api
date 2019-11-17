@@ -64,12 +64,12 @@ final class Authentication
     {
         $url = "https://app.engagor.com/oauth/access_token/";
 
-        $params = array(
+        $params = [
             'client_id' => $this->clientId,
             'client_secret' => $this->clientSecret,
             'grant_type' => 'authorization_code',
             'code' => (string) $code,
-        );
+        ];
 
         $request = $this->requestFactory->createRequest(
             'GET',
