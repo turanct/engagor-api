@@ -33,8 +33,8 @@ In this case PSR-7 and PSR-17 implementations are provided by `nyholm/psr7` and 
 Create an `Authentication` instance:
 
 ```php
-$httpClient = new Buzz\Client\Curl($requestFactory);
 $httpRequestFactory = new Nyholm\Psr7\Factory\Psr17Factory();
+$httpClient = new Buzz\Client\Curl($httpRequestFactory);
 
 $clientId = '<CLIENT ID HERE>';
 $clientSecret = '<CLIENT SECRET HERE>';
